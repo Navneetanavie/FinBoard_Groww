@@ -13,13 +13,16 @@ const Home = () => {
     setShowForm(true);
   };
 
+  const handleCloseWidget = () => {
+    setShowForm(false);
+  }
   return (
     <div>
       <Navbar onAddWidget={handleAddWidget} />
       <div className="p-10 h-full">
         <AddWidget onAddWidget={handleAddWidget} />
       </div>
-      {showForm ? <WidgetForm /> : null}
+      {showForm ? <WidgetForm onClose={handleCloseWidget}/> : null}
     </div>
   );
 };
