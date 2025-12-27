@@ -3,7 +3,8 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --primary: #00bd80;
+  --secondary: #00bd80;
+  --primary: #1b1d25
 }
 
 @theme inline {
@@ -27,10 +28,26 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.bg-secondary {
+  background-color: var(--secondary);
+}
+
 .bg-primary {
   background-color: var(--primary);
 }
 
-.bg-primary:hover {
+.bg-secondary:hover {
   background-color: #008858;
+}
+
+.input-primary {
+  @apply w-full border border-gray-700 rounded-md p-2 focus:border-[var(--secondary)] focus:outline-none;
+}
+
+.button-primary {
+  @apply flex items-center bg-[var(--secondary)] hover:bg-[#008858] px-2 py-1 rounded h-fit cursor-pointer text-sm;
+}
+
+.button-secondary {
+  @apply flex items-center bg-[#4a516e] hover:bg-[#282e46] px-2 py-1 rounded h-fit cursor-pointer text-sm;
 }
