@@ -102,8 +102,8 @@ export const ChartWidget = ({ widgetData }: { widgetData: WidgetFormState }) => 
   };
 
 
-  if (loading && !data) return <div className="animate-pulse bg-[var(--tertiary)] rounded-xl h-64 w-full border border-gray-800"></div>;
-  if (error) return <div className="text-red-400 bg-red-500/10 p-4 rounded-xl border border-red-500/20 text-sm">{error}</div>;
+  // if (loading && !data) return <div className="animate-pulse bg-[var(--tertiary)] rounded-xl h-64 w-full border border-gray-800"></div>;
+  // if (error) return <div className="text-red-400 bg-red-500/10 p-4 rounded-xl border border-red-500/20 text-sm">{error}</div>;
 
   return (
     <div className="bg-[var(--tertiary)] border border-gray-800 rounded-xl px-5 pt-3 pb-3 shadow-sm h-full flex flex-col w-full min-h-[300px]">
