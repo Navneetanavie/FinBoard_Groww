@@ -7,7 +7,7 @@ export type selectedField = {
   label?: string;
 }
 
-export type WidgetFormState = {
+export type WidgetEntity = {
   id?: string;
   [Fields.NAME]: string;
   [Fields.URL]: string;

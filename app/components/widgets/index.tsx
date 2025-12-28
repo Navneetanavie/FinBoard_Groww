@@ -22,15 +22,15 @@ import { ChartWidget } from "./ChartWidget";
 import { TableWidget } from "./TableWidget";
 import { AddWidget } from "./AddWidget";
 
-import type { WidgetFormState } from "../../types";
+import type { WidgetEntity } from "../../types";
 import { Fields } from "../../constants";
 
 interface WidgetsProps {
-  widgets: WidgetFormState[];
-  onReorder: (widgets: WidgetFormState[]) => void;
+  widgets: WidgetEntity[];
+  onReorder: (widgets: WidgetEntity[]) => void;
   onAddWidget: () => void;
   onDeleteWidget: (id: string) => void;
-  onEditWidget: (widget: WidgetFormState) => void;
+  onEditWidget: (widget: WidgetEntity) => void;
 }
 
 export const Widgets = ({ widgets, onReorder, onAddWidget, onDeleteWidget, onEditWidget }: WidgetsProps) => {

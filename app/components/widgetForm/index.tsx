@@ -1,12 +1,12 @@
 "use client";
-import { useState, useReducer } from "react";
+import { useState, useEffect, useReducer } from "react";
 import { ArrowRepeat, Eye } from "react-bootstrap-icons";
 import { FieldsForm } from "./FieldsForm";
 
-import { Fields, initialData, DisplayMode } from "../constants";
-import { WidgetFormState, WidgetFormAction } from "../types";
+import { Fields, initialData, DisplayMode } from "../../constants";
+import { WidgetEntity, WidgetFormAction } from "../../types";
 
-const formReducer = (state: WidgetFormState, action: WidgetFormAction): WidgetFormState => {
+const formReducer = (state: WidgetEntity, action: WidgetFormAction): WidgetEntity => {
   if (action.type === 'UPDATE_FIELD') {
     const newState = { ...state, [action.field]: action.value };
 
@@ -31,12 +31,12 @@ const formReducer = (state: WidgetFormState, action: WidgetFormAction): WidgetFo
   return state;
 };
 
-export const WidgetForm = ({ onClose, onSave, initialValues }: { onClose: () => void; onSave: (data: WidgetFormState) => void; initialValues?: WidgetFormState }) => {
+export const WidgetForm = ({ onClose, onSave, initialValues }: { onClose: () => void; onSave: (data: WidgetEntity) => void; initialValues?: WidgetEntity }) => {
   const [value, dispatch] = useReducer(formReducer, initialValues || initialData);
   const [data, setData] = useState<any>();
   const [errorMessage, setErrorMessage] = useState<string>("");
 
-  const updateValue = ({ key, _value }: { key: string; _value: WidgetFormState[keyof WidgetFormState] }) => {
+  const updateValue = ({ key, _value }: { key: string; _value: WidgetEntity[keyof WidgetEntity] }) => {
     dispatch({ type: 'UPDATE_FIELD', field: key, value: _value });
     // Clear error when user makes changes
     if (errorMessage) setErrorMessage("");
@@ -82,6 +82,12 @@ export const WidgetForm = ({ onClose, onSave, initialValues }: { onClose: () => 
   }
 
   const isEditMode = !!initialValues;
+
+  useEffect(() => {
+    if (isEditMode) {
+      handleTest();
+    }
+  }, [isEditMode]);
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-60">

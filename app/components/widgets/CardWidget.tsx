@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { Collection } from "react-bootstrap-icons";
 import { ActionButtons } from "./ActionButtons";
 import { getValueByPath } from "../../helpers";
-import type { WidgetFormState } from "../../types";
+import type { WidgetEntity } from "../../types";
 
-export const CardWidget = ({ widgetData, onDelete, onEdit }: { widgetData: WidgetFormState; onDelete: () => void; onEdit: () => void }) => {
+export const CardWidget = ({ widgetData, onDelete, onEdit }: { widgetData: WidgetEntity; onDelete: () => void; onEdit: () => void }) => {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
@@ -41,8 +41,8 @@ export const CardWidget = ({ widgetData, onDelete, onEdit }: { widgetData: Widge
     fetchData();
   };
 
-  // if (loading) return <div className="text-gray-400 flex items-center justify-center h-full">Loading...</div>;
-  // if (error) return <div className="text-red-400 bg-red-500/10 p-4 rounded-xl border border-red-500/20 text-sm">{error}</div>;
+  if (loading && !data) return <div className="animate-pulse bg-[var(--tertiary)] border border-gray-800 rounded-xl px-5 pt-3 pb-1 shadow-sm h-50 w-full flex items-center justify-center">Loading...</div>;
+  if (error) return <div className="text-red-400 bg-[var(--tertiary)] border border-gray-800 rounded-xl px-5 pt-3 pb-1 shadow-sm h-50 w-full flex items-center justify-center">{error}</div>;
 
   return (
     <div className="h-full w-full">

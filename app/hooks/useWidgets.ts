@@ -1,18 +1,18 @@
 import { useState, useEffect } from "react";
 
-import type { WidgetFormState } from "../types";
+import type { WidgetEntity } from "../types";
 
 export const useWidgets = () => {
   const [showForm, setShowForm] = useState(false);
-  const [widgetsData, setWidgetsData] = useState<WidgetFormState[]>([]);
-  const [editingWidget, setEditingWidget] = useState<WidgetFormState | undefined>(undefined);
+  const [widgetsData, setWidgetsData] = useState<WidgetEntity[]>([]);
+  const [editingWidget, setEditingWidget] = useState<WidgetEntity | undefined>(undefined);
 
   useEffect(() => {
-    const data = JSON.parse(localStorage.getItem("widgets") || "[]") as WidgetFormState[];
+    const data = JSON.parse(localStorage.getItem("widgets") || "[]") as WidgetEntity[];
     setWidgetsData(data);
   }, []);
 
-  const saveToLocalStorage = (data: WidgetFormState[]) => {
+  const saveToLocalStorage = (data: WidgetEntity[]) => {
     localStorage.setItem("widgets", JSON.stringify(data));
     setWidgetsData(data);
   };
@@ -22,7 +22,7 @@ export const useWidgets = () => {
     setShowForm(true);
   };
 
-  const handleEditWidget = (widget: WidgetFormState) => {
+  const handleEditWidget = (widget: WidgetEntity) => {
     setEditingWidget(widget);
     setShowForm(true);
   };
@@ -32,7 +32,7 @@ export const useWidgets = () => {
     saveToLocalStorage(newData);
   };
 
-  const handleSaveWidget = (widget: WidgetFormState) => {
+  const handleSaveWidget = (widget: WidgetEntity) => {
     const newData = editingWidget
       ? widgetsData.map(w => w.id === widget.id ? widget : w)
       : [...widgetsData, widget];
@@ -46,7 +46,7 @@ export const useWidgets = () => {
     setEditingWidget(undefined);
   }
 
-  const handleReorder = (newWidgets: WidgetFormState[]) => {
+  const handleReorder = (newWidgets: WidgetEntity[]) => {
     saveToLocalStorage(newWidgets);
   }
 

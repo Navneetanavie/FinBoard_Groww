@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 
 import { Navbar } from "./components/Navbar";
-import { WidgetForm } from "./components/WidgetForm";
+import { WidgetForm } from "./components/widgetForm";
 import { Widgets } from "./components/widgets";
 
 import { useWidgets } from "./hooks/useWidgets";

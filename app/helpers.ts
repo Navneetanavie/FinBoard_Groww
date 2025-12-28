@@ -1,5 +1,5 @@
 import { DisplayMode } from "./constants";
-import type { WidgetFormState } from "./types";
+import type { WidgetEntity } from "./types";
 
 const isNumber = (value: string) => {
   return !isNaN(Number(value));
@@ -118,7 +118,7 @@ export const getDataWithAllowedField = (data: any[], allowedFields: string[]) =>
   )) || [];
 }
 
-export const getTableData = ({ widgetData, fetchedData }: { widgetData: WidgetFormState, fetchedData: any }): { columnKeys: { label: string, key: string }[], tableValues: { [key: string]: any }[] } => {
+export const getTableData = ({ widgetData, fetchedData }: { widgetData: WidgetEntity, fetchedData: any }): { columnKeys: { label: string, key: string }[], tableValues: { [key: string]: any }[] } => {
   const path = widgetData.dataKey.split("=>").slice(0, -1).join("=>");
   let rootValue = getValueByPath(fetchedData, path);
   const dataKeyField = widgetData.dataKey.split("=>").pop()!;

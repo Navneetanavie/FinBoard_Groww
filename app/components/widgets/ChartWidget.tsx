@@ -4,11 +4,11 @@ import { useEffect, useState, useRef } from "react";
 import { GraphUp, ExclamationCircle, Dash, Plus, ChevronLeft, ChevronRight } from "react-bootstrap-icons";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { getTableData } from "../../helpers";
-import type { WidgetFormState } from "../../types";
+import type { WidgetEntity } from "../../types";
 
 const COLORS = ["#00bd80", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899"];
 
-export const ChartWidget = ({ widgetData, onDelete, onEdit }: { widgetData: WidgetFormState; onDelete: () => void; onEdit: () => void }) => {
+export const ChartWidget = ({ widgetData, onDelete, onEdit }: { widgetData: WidgetEntity; onDelete: () => void; onEdit: () => void }) => {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
@@ -56,6 +56,7 @@ export const ChartWidget = ({ widgetData, onDelete, onEdit }: { widgetData: Widg
     key: col.key.replace(/[^a-zA-Z0-9_]/g, "_"),
     label: col.label
   }))
+  console.log("🚀 ~ ChartWidget ~ normalizedColumnKeys:", normalizedColumnKeys)
 
   // Pagination Logic
   const totalPages = Math.ceil(tableValues.length / itemsPerPage);
@@ -78,6 +79,7 @@ export const ChartWidget = ({ widgetData, onDelete, onEdit }: { widgetData: Widg
     })
     return normalizedItem;
   });
+  console.log("🚀 ~ ChartWidget ~ formattedData:", formattedData)
 
   const handleZoomIn = () => {
     setItemsPerPage(prev => Math.max(10, prev - 10));
@@ -103,11 +105,11 @@ export const ChartWidget = ({ widgetData, onDelete, onEdit }: { widgetData: Widg
   };
 
 
-  // if (loading && !data) return <div className="animate-pulse bg-[var(--tertiary)] rounded-xl h-64 w-full border border-gray-800"></div>;
-  // if (error) return <div className="text-red-400 bg-red-500/10 p-4 rounded-xl border border-red-500/20 text-sm">{error}</div>;
+  if (loading && !data) return <div className="animate-pulse bg-[var(--tertiary)] border border-gray-800 rounded-xl px-5 pt-3 pb-3 shadow-sm h-135 w-full flex items-center justify-center">Loading...</div>;
+  if (error) return <div className="text-red-400 bg-[var(--tertiary)] border border-gray-800 rounded-xl px-5 pt-3 pb-3 shadow-sm h-135 w-full flex items-center justify-center">{error}</div>;
 
   return (
-    <div className="bg-[var(--tertiary)] border border-gray-800 rounded-xl px-5 pt-3 pb-3 shadow-sm h-full flex flex-col w-full">
+    <div className="bg-[var(--tertiary)] border border-gray-800 rounded-xl px-5 pt-3 pb-3 shadow-sm h-135 flex flex-col w-full">
       <div className="flex justify-between items-center mb-2">
         <div className="flex items-center gap-3">
           <div className="text-gray-400">

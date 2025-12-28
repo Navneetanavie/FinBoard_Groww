@@ -1,4 +1,4 @@
-import { WidgetFormState } from "./types";
+import { WidgetEntity } from "./types";
 
 export enum DisplayMode {
   TABLE = "table",
@@ -24,4 +24,4 @@ export const initialData = {
   [Fields.FIELDS]: [],
   [Fields.DATA_KEY]: "",
   [Fields.DATA_KEY_LABEL]: ""
-} as WidgetFormState;
+} as WidgetEntity;

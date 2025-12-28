@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { getSelectableFields } from "../helpers";
+import { getSelectableFields } from "../../helpers";
 
 import { Plus, X } from 'react-bootstrap-icons'
-import { DisplayMode, Fields } from "../constants";
-import { selectedField } from "../types";
+import { DisplayMode, Fields } from "../../constants";
+import { selectedField } from "../../types";
 import { Dropdown } from "./Dropdown";
 
 export const FieldsForm = ({ data, formValue, onFormChange }: { data: any, formValue: any, onFormChange: ({ key, _value }: { key: string, _value: any }) => void }) => {

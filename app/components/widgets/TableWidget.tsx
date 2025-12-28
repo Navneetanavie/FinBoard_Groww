@@ -2,11 +2,11 @@ import { useEffect, useState, useRef } from "react";
 import { Table as TableIcon, Search, ChevronLeft, ChevronRight } from "react-bootstrap-icons";
 import { ActionButtons } from "./ActionButtons";
 import { getTableData } from "../../helpers";
-import type { WidgetFormState } from "../../types";
+import type { WidgetEntity } from "../../types";
 
 const ITEMS_PER_PAGE = 8;
 
-export const TableWidget = ({ widgetData, onDelete, onEdit }: { widgetData: WidgetFormState; onDelete: () => void; onEdit: () => void }) => {
+export const TableWidget = ({ widgetData, onDelete, onEdit }: { widgetData: WidgetEntity; onDelete: () => void; onEdit: () => void }) => {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
@@ -47,8 +47,8 @@ export const TableWidget = ({ widgetData, onDelete, onEdit }: { widgetData: Widg
     fetchData();
   };
 
-  // if (loading && !data) return <div className="animate-pulse bg-[var(--tertiary)] rounded-xl h-48 w-full border border-gray-800"></div>;
-  // if (error) return <div className="text-red-400 bg-red-500/10 p-4 rounded-xl border border-red-500/20 text-sm">{error}</div>;
+  if (loading && !data) return <div className="animate-pulse bg-[var(--tertiary)] border border-gray-800 rounded-xl px-5 pt-3 pb-3 shadow-sm h-135 w-full flex items-center justify-center">Loading...</div>;
+  if (error) return <div className="text-red-400 bg-[var(--tertiary)] border border-gray-800 rounded-xl px-5 pt-3 pb-3 shadow-sm h-135 w-full flex items-center justify-center">{error}</div>;
 
   const { columnKeys, tableValues } = getTableData({ widgetData, fetchedData: data });
 

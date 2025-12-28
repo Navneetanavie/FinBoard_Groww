@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { ChevronDown } from "react-bootstrap-icons";
-import { Option } from "../types";
+import { Option } from "../../types";
 
 interface DropdownProps {
   options: Option[];
