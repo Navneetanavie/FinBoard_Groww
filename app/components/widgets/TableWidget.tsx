@@ -1,11 +1,12 @@
 import { useEffect, useState, useRef } from "react";
-import { ArrowRepeat, Gear, Trash, Table as TableIcon, Search, ChevronLeft, ChevronRight } from "react-bootstrap-icons";
+import { Table as TableIcon, Search, ChevronLeft, ChevronRight } from "react-bootstrap-icons";
+import { ActionButtons } from "./ActionButtons";
 import { getTableData } from "../../helpers";
 import type { WidgetFormState } from "../../types";
 
 const ITEMS_PER_PAGE = 8;
 
-export const TableWidget = ({ widgetData }: { widgetData: WidgetFormState }) => {
+export const TableWidget = ({ widgetData, onDelete, onEdit }: { widgetData: WidgetFormState; onDelete: () => void; onEdit: () => void }) => {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
@@ -88,17 +89,12 @@ export const TableWidget = ({ widgetData }: { widgetData: WidgetFormState }) => 
             </span>
           )}
         </div>
-        <div className="flex items-center gap-3 text-gray-500">
-          <button onClick={refreshNow} className="hover:text-gray-300 transition-colors" title="Refresh">
-            <ArrowRepeat size={14} className={loading && data ? "animate-spin" : ""} />
-          </button>
-          <button className="hover:text-gray-300 transition-colors" title="Settings">
-            <Gear size={14} />
-          </button>
-          <button className="hover:text-red-400 transition-colors" title="Delete">
-            <Trash size={14} />
-          </button>
-        </div>
+        <ActionButtons
+          onRefresh={refreshNow}
+          isRefreshing={loading && !!data}
+          onDelete={onDelete}
+          onSettings={onEdit}
+        />
       </div>
 
       <div className="mb-3 relative group">

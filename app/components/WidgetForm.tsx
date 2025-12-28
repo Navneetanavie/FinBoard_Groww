@@ -31,8 +31,8 @@ const formReducer = (state: WidgetFormState, action: WidgetFormAction): WidgetFo
   return state;
 };
 
-export const WidgetForm = ({ onClose }: { onClose: () => void }) => {
-  const [value, dispatch] = useReducer(formReducer, initialData);
+export const WidgetForm = ({ onClose, onSave, initialValues }: { onClose: () => void; onSave: (data: WidgetFormState) => void; initialValues?: WidgetFormState }) => {
+  const [value, dispatch] = useReducer(formReducer, initialValues || initialData);
   const [data, setData] = useState<any>();
   const [errorMessage, setErrorMessage] = useState<string>("");
 
@@ -73,8 +73,7 @@ export const WidgetForm = ({ onClose }: { onClose: () => void }) => {
     };
 
     try {
-      const existingWidgets = JSON.parse(localStorage.getItem("widgets") || "[]");
-      localStorage.setItem("widgets", JSON.stringify([...existingWidgets, { ...value, id: value.id || crypto.randomUUID() }]));
+      onSave({ ...value, id: value.id || crypto.randomUUID() });
       onClose();
     } catch (e) {
       console.error("Failed to save widget", e);
@@ -82,10 +81,12 @@ export const WidgetForm = ({ onClose }: { onClose: () => void }) => {
     }
   }
 
+  const isEditMode = !!initialValues;
+
   return (
     <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-50">
       <div className="w-160 bg-primary rounded-md flex flex-col max-h-[90vh]">
-        <div className="border-b border-gray-800 px-5 py-3 text-l font-semibold">Add New Widget</div>
+        <div className="border-b border-gray-800 px-5 py-3 text-l font-semibold">{isEditMode ? "Edit Widget" : "Add New Widget"}</div>
         {errorMessage && (
           <div className="bg-red-500/10 border border-red-500/50 text-red-500 px-4 py-2 mx-5 mt-4 rounded text-sm text-center">
             {errorMessage}
@@ -94,12 +95,24 @@ export const WidgetForm = ({ onClose }: { onClose: () => void }) => {
         <div className="flex flex-col gap-4 p-5 overflow-y-auto">
           <div>
             <div className="text-sm mb-1">Widget Name</div>
-            <input onChange={(e) => updateValue({ key: Fields.NAME, _value: e.target.value })} className="input-primary" type="text" placeholder="eg. Bitcoin Price Tracker" />
+            <input
+              value={value[Fields.NAME]}
+              onChange={(e) => updateValue({ key: Fields.NAME, _value: e.target.value })}
+              className="input-primary"
+              type="text"
+              placeholder="eg. Bitcoin Price Tracker"
+            />
           </div>
           <div>
             <div className="text-sm mb-1">API URL</div>
             <div className="flex gap-2">
-              <input onChange={onAPIChange} className="input-primary" type="text" placeholder="eg. https://api.coinbase.com/v2/exchange-rates?currency=BTC" />
+              <input
+                value={value[Fields.URL]}
+                onChange={onAPIChange}
+                className="input-primary"
+                type="text"
+                placeholder="eg. https://api.coinbase.com/v2/exchange-rates?currency=BTC"
+              />
               <button
                 onClick={handleTest}
                 className={value[Fields.URL] ? "button-primary" : "button-secondary"}
@@ -113,13 +126,19 @@ export const WidgetForm = ({ onClose }: { onClose: () => void }) => {
           </div>
           <div>
             <div className="text-sm mb-1">Refresh Interval (seconds)</div>
-            <input onChange={(e) => updateValue({ key: Fields.REFRESH_INTERVAL, _value: Number(e.target.value) })} className="input-primary" type="number" placeholder="eg. 30" />
+            <input
+              value={value[Fields.REFRESH_INTERVAL]}
+              onChange={(e) => updateValue({ key: Fields.REFRESH_INTERVAL, _value: Number(e.target.value) })}
+              className="input-primary"
+              type="number"
+              placeholder="eg. 30"
+            />
           </div>
-          {data && <FieldsForm data={data} formValue={value} onFormChange={updateValue} />}
+          {(data || isEditMode) && <FieldsForm data={data} formValue={value} onFormChange={updateValue} />}
         </div>
         <div className="flex justify-end border-t border-gray-800 px-5 py-3 gap-2">
           <button className="button-secondary" onClick={onClose}>Cancel</button>
-          <button className="button-primary" onClick={handleSave}>Add Widget</button>
+          <button className="button-primary" onClick={handleSave}>{isEditMode ? "Save Changes" : "Add Widget"}</button>
         </div>
       </div>
     </div>

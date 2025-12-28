@@ -1,3 +1,5 @@
+import { WidgetFormState } from "./types";
+
 export enum DisplayMode {
   TABLE = "table",
   CHART = "chart",
@@ -22,4 +24,4 @@ export const initialData = {
   [Fields.FIELDS]: [],
   [Fields.DATA_KEY]: "",
   [Fields.DATA_KEY_LABEL]: ""
-};
+} as WidgetFormState;

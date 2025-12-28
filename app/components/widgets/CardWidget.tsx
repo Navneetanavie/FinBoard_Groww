@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
-import { ArrowRepeat, Gear, Trash, Collection } from "react-bootstrap-icons";
+import { Collection } from "react-bootstrap-icons";
+import { ActionButtons } from "./ActionButtons";
 import type { WidgetFormState } from "../../types";
 
 const getValueByPath = (obj: any, path: string) => {
@@ -7,7 +8,7 @@ const getValueByPath = (obj: any, path: string) => {
   return path.split('.').reduce((acc, part) => acc && acc[part], obj);
 }
 
-export const CardWidget = ({ widgetData }: { widgetData: WidgetFormState }) => {
+export const CardWidget = ({ widgetData, onDelete, onEdit }: { widgetData: WidgetFormState; onDelete: () => void; onEdit: () => void }) => {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
@@ -62,17 +63,12 @@ export const CardWidget = ({ widgetData }: { widgetData: WidgetFormState }) => {
               </span>
             )}
           </div>
-          <div className="flex items-center gap-3 text-gray-500">
-            <button onClick={refreshNow} className="hover:text-gray-300 transition-colors" title="Refresh">
-              <ArrowRepeat size={14} className={loading && data ? "animate-spin" : ""} />
-            </button>
-            <button className="hover:text-gray-300 transition-colors" title="Settings">
-              <Gear size={14} />
-            </button>
-            <button className="hover:text-red-400 transition-colors" title="Delete">
-              <Trash size={14} />
-            </button>
-          </div>
+          <ActionButtons
+            onRefresh={refreshNow}
+            isRefreshing={loading && !!data}
+            onDelete={onDelete}
+            onSettings={onEdit}
+          />
         </div>
 
         <div className="flex-1 flex flex-col gap-3 overflow-y-auto custom-scrollbar">
