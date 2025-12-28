@@ -128,9 +128,9 @@ export const FieldsForm = ({ data, formValue, onFormChange }: { data: any, formV
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="flex flex-col gap-4">
           <div>
-            <div className="text-xs text-gray-400 mb-2">Available Fields</div>
+            <div className="text-sm mb-1">Available Fields</div>
             <div className="h-40 overflow-y-auto border border-gray-700 rounded p-2 flex flex-col gap-1">
               {filteredFields?.map((path: any) => (
                 <div key={path.path} className="flex items-center justify-between p-1 hover:bg-white/5 rounded">
@@ -145,7 +145,7 @@ export const FieldsForm = ({ data, formValue, onFormChange }: { data: any, formV
           </div>
 
           <div>
-            <div className="text-xs text-gray-400 mb-2">Selected Fields</div>
+            <div className="text-sm mb-1">Selected Fields</div>
             <div className="h-40 overflow-y-auto border border-gray-700 rounded p-2 flex flex-col gap-1">
               {selectedFields.map((field: selectedField) => (
                 <div key={field.path} className="flex items-center justify-between p-1 hover:bg-white/5 rounded gap-2">
