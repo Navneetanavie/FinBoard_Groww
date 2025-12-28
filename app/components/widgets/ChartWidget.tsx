@@ -1,39 +1,9 @@
+"use client";
 import { useEffect, useState, useRef } from "react";
-import { ArrowRepeat, Gear, Trash, GraphUp, ExclamationCircle } from "react-bootstrap-icons";
+import { ArrowRepeat, Gear, Trash, GraphUp, ExclamationCircle, Dash, Plus, ChevronLeft, ChevronRight } from "react-bootstrap-icons";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { findArrayField, findHomogeneousField } from "../../helpers";
+import { getTableData } from "../../helpers";
 import type { WidgetFormState } from "../../types";
-
-const getValueByPath = (obj: any, path: string) => {
-  if (!obj) return null;
-  return path.split('.').reduce((acc, part) => acc && acc[part], obj);
-}
-
-const getRelativePath = (fullPath: string, rootPath: string) => {
-  if (!rootPath) return fullPath;
-  if (fullPath.startsWith(rootPath + '.')) {
-    return fullPath.slice(rootPath.length + 1);
-  }
-  return fullPath;
-}
-
-// Custom Tooltip for Dark Theme
-const CustomTooltip = ({ active, payload, label }: any) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="bg-[#1e2035] border border-gray-700 p-3 rounded shadow-lg text-xs">
-        <p className="text-gray-300 mb-2 font-semibold">{label}</p>
-        {payload.map((p: any, index: number) => (
-          <p key={index} style={{ color: p.color }} className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: p.color }}></span>
-            {p.name}: {p.value}
-          </p>
-        ))}
-      </div>
-    );
-  }
-  return null;
-};
 
 const COLORS = ["#00bd80", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899"];
 
@@ -42,7 +12,10 @@ export const ChartWidget = ({ widgetData }: { widgetData: WidgetFormState }) => 
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Pagination and Zoom State
+  const [itemsPerPage, setItemsPerPage] = useState<number>(500);
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   const fetchData = async () => {
     try {
@@ -76,62 +49,58 @@ export const ChartWidget = ({ widgetData }: { widgetData: WidgetFormState }) => 
     fetchData();
   };
 
-  // Data processing logic (Same as TableWidget to extract the list)
-  let chartData: any[] = [];
-  let rootPath = "";
+  const { columnKeys: columnKeys, tableValues } = data ? getTableData({ widgetData, fetchedData: data }) : { columnKeys: [], tableValues: [] };
 
-  const arrayField = findArrayField({ obj: data });
-  const homogeneousField = findHomogeneousField({ obj: data });
+  const normalizedColumnKeys = columnKeys.map((col) => ({
+    key: col.key.replace(/[^a-zA-Z0-9_]/g, "_"),
+    label: col.label
+  }))
 
-  if (homogeneousField && widgetData.dataKey === homogeneousField.path) {
-    rootPath = homogeneousField.path;
-    chartData = Object.entries(homogeneousField.obj).map(([key, value]) => ({ ...(value as object), _key: key }));
-  } else if (arrayField) {
-    rootPath = arrayField.path;
-    chartData = arrayField.array;
-  }
+  // Pagination Logic
+  const totalPages = Math.ceil(tableValues.length / itemsPerPage);
 
-  // Flatten data for Recharts (Recharts likes simple objects)
-  const formattedData = chartData.map((item, index) => {
-    const flattenedItem: any = { _index: index }; // Fallback X-Axis
-
-    // X-Axis Value
-    if (widgetData.dataKey) {
-      if (rootPath && widgetData.dataKey.startsWith(rootPath)) { // If dataKey is deep
-        // If the dataKey is actually pointing to the array itself or a property inside
-        // For Charts, dataKey usually implies the X-Axis Label Field
-        // If widgetData.dataKey == rootPath, it means the user selected the array itself as key? 
-        // Let's assume widgetData.dataKey acts as the Unique ID column for X-Axis
-      }
-
-      if (isHomogeneous(item)) { // If specific logic needed
-        // Using _key from above
-        flattenedItem[widgetData.dataKey] = item._key;
-      }
+  // Ensure current page is valid when data/itemsPerPage changes
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(totalPages);
     }
+  }, [totalPages, itemsPerPage]);
 
-    // Populate Y-Axis Fields
-    widgetData.fields.forEach(field => {
-      const relativePath = getRelativePath(field.path, rootPath);
-      const value = getValueByPath(item, relativePath);
-      flattenedItem[field.path] = isNumber(value) ? Number(value) : value;
-    });
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedDataValues = tableValues.slice(startIndex, startIndex + itemsPerPage);
 
-    // Handle X-Axis explicitly
-    // If the user selected a "Key" in the form, that's our X-Axis candidate
-    if (widgetData.dataKey) {
-      const relativeKeyPath = getRelativePath(widgetData.dataKey, rootPath);
-      flattenedItem._xAxis = getValueByPath(item, relativeKeyPath) || item._key || index;
-    } else {
-      flattenedItem._xAxis = index;
-    }
-
-    return flattenedItem;
+  // Normalize keys in formatted data
+  const formattedData = paginatedDataValues.map((item: any) => {
+    const normalizedItem: any = {};
+    normalizedColumnKeys.forEach((col, index) => {
+      normalizedItem[col.key] = item[columnKeys[index].key];
+    })
+    return normalizedItem;
   });
 
-  // Helper to check for number
-  function isNumber(n: any) { return !isNaN(parseFloat(n)) && isFinite(n); }
-  function isHomogeneous(i: any) { return i._key !== undefined; }
+  const handleZoomIn = () => {
+    setItemsPerPage(prev => Math.max(10, prev - 10));
+  };
+
+  const handleZoomOut = () => {
+    setItemsPerPage(prev => Math.min(1000, prev + 10));
+  };
+
+  const handlePointsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let val = parseInt(e.target.value);
+    if (isNaN(val)) val = 10; // default min
+    if (val > 1000) val = 1000;
+    setItemsPerPage(val);
+  };
+
+  const handlePrevPage = () => {
+    setCurrentPage(prev => Math.max(1, prev - 1));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage(prev => Math.min(totalPages, prev + 1));
+  };
+
 
   if (loading && !data) return <div className="animate-pulse bg-[var(--tertiary)] rounded-xl h-64 w-full border border-gray-800"></div>;
   if (error) return <div className="text-red-400 bg-red-500/10 p-4 rounded-xl border border-red-500/20 text-sm">{error}</div>;
@@ -163,13 +132,13 @@ export const ChartWidget = ({ widgetData }: { widgetData: WidgetFormState }) => 
         </div>
       </div>
 
-      <div className="flex-1 w-full min-h-0">
+      <div className="w-full h-100">
         {formattedData.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={formattedData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#374151" vertical={false} />
               <XAxis
-                dataKey="_xAxis"
+                dataKey={normalizedColumnKeys[0].key}
                 stroke="#9CA3AF"
                 tick={{ fill: '#9CA3AF', fontSize: 10 }}
                 tickLine={false}
@@ -180,18 +149,19 @@ export const ChartWidget = ({ widgetData }: { widgetData: WidgetFormState }) => 
                 tick={{ fill: '#9CA3AF', fontSize: 10 }}
                 tickLine={false}
                 axisLine={false}
+                domain={['auto', 'auto']}
               />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip contentStyle={{ backgroundColor: "#1e2035", borderColor: "#374151", color: "#f3f4f6" }} itemStyle={{ color: "#f3f4f6" }} />
               <Legend iconType="circle" wrapperStyle={{ paddingTop: '10px' }} />
-              {widgetData.fields.map((field, index) => (
+              {normalizedColumnKeys.slice(1).map((col, index) => (
                 <Line
-                  key={field.path}
+                  key={col.key}
                   type="monotone"
-                  dataKey={field.path}
-                  name={field.label || field.path}
+                  dataKey={col.key}
+                  name={col.label}
                   stroke={COLORS[index % COLORS.length]}
                   strokeWidth={2}
-                  dot={{ r: 3, strokeWidth: 0 }}
+                  dot={{ r: 0, strokeWidth: 0 }}
                   activeDot={{ r: 5 }}
                   isAnimationActive={false}
                 />
@@ -206,10 +176,63 @@ export const ChartWidget = ({ widgetData }: { widgetData: WidgetFormState }) => 
         )}
       </div>
 
-      <div className="mt-2 text-center">
+      <div className="mt-2 flex items-center justify-between border-t border-gray-800 pt-2">
+        {/* Zoom Controls */}
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold">Points</span>
+          <div className="flex items-center gap-1 bg-black/20 rounded p-0.5 border border-gray-700">
+            <button
+              onClick={handleZoomIn}
+              className="p-1 hover:text-white text-gray-400 disabled:opacity-50"
+              disabled={itemsPerPage <= 10}
+              title="Zoom In (Fewer Points)"
+            >
+              <Dash size={12} />
+            </button>
+            <input
+              type="number"
+              value={itemsPerPage}
+              onChange={handlePointsChange}
+              className="w-12 bg-transparent text-center text-xs text-gray-300 focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+            />
+            <button
+              onClick={handleZoomOut}
+              className="p-1 hover:text-white text-gray-400 disabled:opacity-50"
+              disabled={itemsPerPage >= 1000}
+              title="Zoom Out (More Points)"
+            >
+              <Plus size={12} />
+            </button>
+          </div>
+        </div>
+
+        {/* Info */}
         <span className="text-[10px] text-gray-600 font-medium">
           Last updated: {lastUpdated ? lastUpdated.toLocaleTimeString([], { hour12: false }) : "--:--:--"}
         </span>
+
+        {/* Pagination Controls */}
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] text-gray-500">
+            {currentPage} / {totalPages || 1}
+          </span>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={handlePrevPage}
+              disabled={currentPage === 1}
+              className="p-1 hover:text-white text-gray-400 disabled:opacity-30 disabled:hover:text-gray-400"
+            >
+              <ChevronLeft size={14} />
+            </button>
+            <button
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages || totalPages === 0}
+              className="p-1 hover:text-white text-gray-400 disabled:opacity-30 disabled:hover:text-gray-400"
+            >
+              <ChevronRight size={14} />
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   )

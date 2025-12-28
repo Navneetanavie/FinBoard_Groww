@@ -20,7 +20,7 @@ export const FieldsForm = ({ data, formValue, onFormChange }: { data: any, formV
     if (isKeyDefined) {
       onFormChange({ key: Fields.DATA_KEY, _value: path });
     }
-  }, []);
+  }, [formValue[Fields.DISPLAY_MODE]]);
 
   const handleAddField = (path: selectedField) => {
     if (selectedFields.some((field: selectedField) => field.path === path.path)) return;

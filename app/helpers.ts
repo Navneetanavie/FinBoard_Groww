@@ -1,4 +1,5 @@
 import { DisplayMode } from "./constants";
+import type { WidgetFormState } from "./types";
 
 const isNumber = (value: string) => {
   return !isNaN(Number(value));
@@ -10,7 +11,7 @@ const getType = (value: string) => {
 
 export const extractPaths = ({ obj, prefix = "", result = [] }: { obj: any, prefix?: string, result?: any }) => {
   for (const key in obj) {
-    const path = prefix ? `${prefix}.${key}` : key;
+    const path = prefix ? `${prefix}=>${key}` : key;
     if (obj[key] !== null && typeof obj[key] === "object" && !Array.isArray(obj[key])) {
       extractPaths({ obj: obj[key], prefix: path, result });
     } else if (Array.isArray(obj[key]) && obj[key].length === 1) {
@@ -39,7 +40,7 @@ export const findHomogeneousField = ({ obj, currentPath = '' }: { obj: any, curr
 
   // Recurse into nested objects/arrays
   for (const [key, value] of Object.entries(obj)) {
-    const path = currentPath ? `${currentPath}.${key}` : key;
+    const path = currentPath ? `${currentPath}=>${key}` : key;
     if (obj[key] !== null && typeof obj[key] === "object" && !Array.isArray(obj[key])) {
       const result = findHomogeneousField({ obj: value, currentPath: path });
       if (result) return result;
@@ -52,7 +53,7 @@ export const findArrayField = ({ obj, currentPath = '' }: { obj: any, currentPat
   if (typeof obj !== 'object' || obj === null) return null;
   // Recurse into nested objects/arrays
   for (const [key, value] of Object.entries(obj)) {
-    const path = currentPath ? `${currentPath}.${key}` : key;
+    const path = currentPath ? `${currentPath}=>${key}` : key;
     if (obj[key] !== null && typeof obj[key] === "object" && !Array.isArray(obj[key])) {
       const result = findArrayField({ obj: value, currentPath: path });
       if (result) return result;
@@ -76,7 +77,7 @@ export const getSelectableFields = ({ data, widgetType }: { data: any, widgetTyp
     const { path, obj } = homogeneousField;
     return {
       selectableFields: Object.keys(obj[Object.keys(obj)[0]]).map((key) => ({
-        path: `${path}.${key}`,
+        path: `${path}=>${key}`,
         type: getType(obj[Object.keys(obj)[0]][key])
       })),
       path,
@@ -89,11 +90,53 @@ export const getSelectableFields = ({ data, widgetType }: { data: any, widgetTyp
     const { path, array } = arrayField;
     return {
       selectableFields: Object.keys(array[0]).map((key) => ({
-        path: `${path}.${key}`,
+        path: `${path}=>${key}`,
         type: getType(array[0][key])
       })),
       path,
       isKeyDefined: false
     };
   }
+}
+
+export const getValueByPath = (obj: any, path: string) => {
+  if (!obj) return null;
+  return path.split('=>').reduce((acc, part) => acc && acc[part], obj);
+}
+
+export const getRelativePath = (fullPath: string, rootPath: string) => {
+  if (!rootPath) return fullPath;
+  if (fullPath.startsWith(rootPath + '=>')) {
+    return fullPath.slice(rootPath.length + 2);
+  }
+  return fullPath;
+}
+
+export const getDataWithAllowedField = (data: any[], allowedFields: string[]) => {
+  return data?.map((item) => Object.fromEntries(
+    Object.entries(item).filter(([key]) => allowedFields.includes(key))
+  )) || [];
+}
+
+export const getTableData = ({ widgetData, fetchedData }: { widgetData: WidgetFormState, fetchedData: any }): { columnKeys: { label: string, key: string }[], tableValues: { [key: string]: any }[] } => {
+  const path = widgetData.dataKey.split("=>").slice(0, -1).join("=>");
+  let rootValue = getValueByPath(fetchedData, path);
+  const dataKeyField = widgetData.dataKey.split("=>").pop()!;
+  const columnKeys = [
+    { label: widgetData.dataKeyLabel ?? widgetData.dataKey, key: dataKeyField },
+    ...widgetData.fields.map((field) => ({ label: field.label ?? field.path, key: field.path.split("=>").pop()! }))];
+  if (!Array.isArray(rootValue)) {
+    const homogeneousValue = getValueByPath(fetchedData, widgetData.dataKey);
+    if (homogeneousValue && !Array.isArray(homogeneousValue) && typeof homogeneousValue === "object") {
+      rootValue = Object.keys(homogeneousValue).map((key) => ({
+        [dataKeyField]: key,
+        ...homogeneousValue[key]
+      }))
+    }
+  }
+  const filteredTableValues = getDataWithAllowedField(rootValue, columnKeys.map((col) => col.key));
+  return {
+    columnKeys,
+    tableValues: filteredTableValues
+  };
 }

@@ -1,48 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { ArrowRepeat, Gear, Trash, Table as TableIcon, Search, ChevronLeft, ChevronRight } from "react-bootstrap-icons";
+import { getTableData } from "../../helpers";
 import type { WidgetFormState } from "../../types";
-
-const getValueByPath = (obj: any, path: string) => {
-  if (!obj) return null;
-  return path.split('.').reduce((acc, part) => acc && acc[part], obj);
-}
-
-const getDataWithAllowedField = (data: any[], allowedFields: string[]) => {
-  return data?.map((item) => Object.fromEntries(
-    Object.entries(item).filter(([key]) => allowedFields.includes(key))
-  )) || [];
-}
-
-const getTableData = ({ widgetData, fetchedData }: { widgetData: WidgetFormState, fetchedData: any }): { columnKeys: { label: string, key: string }[], tableValues: { [key: string]: any }[] } => {
-  const path = widgetData.dataKey.split(".").slice(0, -1).join(".");
-  const rootValue = getValueByPath(fetchedData, path);
-  if (!Array.isArray(rootValue)) {
-    const homogeneousValue = getValueByPath(fetchedData, widgetData.dataKey);
-    if (homogeneousValue && !Array.isArray(homogeneousValue) && typeof homogeneousValue === "object") {
-      const columnKeys = [
-        { label: widgetData.dataKeyLabel ?? widgetData.dataKey, key: widgetData.dataKey.split(".").pop()! },
-        ...widgetData.fields.map((field) => ({ label: field.label ?? field.path, key: field.path.split(".").pop()! }))];
-      const tableValues = Object.keys(homogeneousValue).map((key) => ({
-        [widgetData.dataKeyLabel ?? widgetData.dataKey]: key,
-        ...homogeneousValue[key]
-      }))
-      const filteredTableValues = getDataWithAllowedField(tableValues, columnKeys.map((col) => col.key));
-      return {
-        columnKeys,
-        tableValues: filteredTableValues
-      };
-    }
-  }
-  const columnKeys = [
-    { label: widgetData.dataKeyLabel ?? widgetData.dataKey, key: widgetData.dataKey.split(".").pop()! },
-    ...widgetData.fields.map((field) => ({ label: field.label ?? field.path, key: field.path.split(".").pop()! }))
-  ];
-  const filteredTableValues = getDataWithAllowedField(rootValue, columnKeys.map((col) => col.key));
-  return {
-    columnKeys,
-    tableValues: filteredTableValues
-  };
-}
 
 const ITEMS_PER_PAGE = 8;
 
