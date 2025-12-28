@@ -107,7 +107,7 @@ export const ChartWidget = ({ widgetData, onDelete, onEdit }: { widgetData: Widg
   // if (error) return <div className="text-red-400 bg-red-500/10 p-4 rounded-xl border border-red-500/20 text-sm">{error}</div>;
 
   return (
-    <div className="bg-[var(--tertiary)] border border-gray-800 rounded-xl px-5 pt-3 pb-3 shadow-sm h-full flex flex-col w-full min-h-[300px]">
+    <div className="bg-[var(--tertiary)] border border-gray-800 rounded-xl px-5 pt-3 pb-3 shadow-sm h-full flex flex-col w-full">
       <div className="flex justify-between items-center mb-2">
         <div className="flex items-center gap-3">
           <div className="text-gray-400">
@@ -128,7 +128,7 @@ export const ChartWidget = ({ widgetData, onDelete, onEdit }: { widgetData: Widg
         />
       </div>
 
-      <div className="w-full h-100">
+      <div className="w-full grow">
         {formattedData.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={formattedData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
