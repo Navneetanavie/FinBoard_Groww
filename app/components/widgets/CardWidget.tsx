@@ -1,12 +1,8 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Collection } from "react-bootstrap-icons";
 import { ActionButtons } from "./ActionButtons";
+import { getValueByPath } from "../../helpers";
 import type { WidgetFormState } from "../../types";
-
-const getValueByPath = (obj: any, path: string) => {
-  if (!obj) return null;
-  return path.split('.').reduce((acc, part) => acc && acc[part], obj);
-}
 
 export const CardWidget = ({ widgetData, onDelete, onEdit }: { widgetData: WidgetFormState; onDelete: () => void; onEdit: () => void }) => {
   const [data, setData] = useState<any>(null);

@@ -84,7 +84,7 @@ export const WidgetForm = ({ onClose, onSave, initialValues }: { onClose: () => 
   const isEditMode = !!initialValues;
 
   return (
-    <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-60">
       <div className="w-160 bg-primary rounded-md flex flex-col max-h-[90vh]">
         <div className="border-b border-gray-800 px-5 py-3 text-l font-semibold">{isEditMode ? "Edit Widget" : "Add New Widget"}</div>
         {errorMessage && (

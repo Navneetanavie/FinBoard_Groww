@@ -15,7 +15,7 @@ export const ChartWidget = ({ widgetData, onDelete, onEdit }: { widgetData: Widg
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   // Pagination and Zoom State
-  const [itemsPerPage, setItemsPerPage] = useState<number>(500);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(100);
   const [currentPage, setCurrentPage] = useState<number>(1);
 
   const fetchData = async () => {

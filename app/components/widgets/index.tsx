@@ -59,7 +59,7 @@ export const Widgets = ({ widgets, onReorder, onAddWidget, onDeleteWidget, onEdi
   };
 
   return (
-    <div className="p-4 h-full overflow-y-auto">
+    <div className="px-10 py-4 h-full overflow-y-auto">
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
