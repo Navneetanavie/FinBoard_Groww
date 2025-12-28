@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { Navbar } from "./components/Navbar";
-import { AddWidget } from "./components/AddWidget";
 import { WidgetForm } from "./components/WidgetForm";
+import { Widgets } from "./components/widgets";
 
 const Home = () => {
 
@@ -16,13 +16,12 @@ const Home = () => {
   const handleCloseWidget = () => {
     setShowForm(false);
   }
+
   return (
     <div>
       <Navbar onAddWidget={handleAddWidget} />
-      <div className="p-10 h-full">
-        <AddWidget onAddWidget={handleAddWidget} />
-      </div>
-      {showForm ? <WidgetForm onClose={handleCloseWidget}/> : null}
+      <Widgets handleAddWidget={handleAddWidget} />
+      {showForm ? <WidgetForm onClose={handleCloseWidget} /> : null}
     </div>
   );
 };

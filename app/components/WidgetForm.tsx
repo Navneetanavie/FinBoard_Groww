@@ -3,7 +3,7 @@ import { useState, useReducer } from "react";
 import { ArrowRepeat, Eye } from "react-bootstrap-icons";
 import { FieldsForm } from "./FieldsForm";
 
-import { Fields, initialData } from "../constants";
+import { Fields, initialData, DisplayMode } from "../constants";
 import { WidgetFormState, WidgetFormAction } from "../types";
 
 const formReducer = (state: WidgetFormState, action: WidgetFormAction): WidgetFormState => {
@@ -65,7 +65,7 @@ export const WidgetForm = ({ onClose }: { onClose: () => void }) => {
       value[Fields.REFRESH_INTERVAL] > 0 &&
       value[Fields.DISPLAY_MODE] &&
       value[Fields.FIELDS].length > 0 &&
-      value[Fields.DATA_KEY].trim().length > 0;
+      (value[Fields.DISPLAY_MODE] !== DisplayMode.CARD ? value[Fields.DATA_KEY].trim().length > 0 : true);
 
     if (!isValid) {
       setErrorMessage("Fill all the fields");

@@ -25,7 +25,7 @@ export const extractPaths = ({ obj, prefix = "", result = [] }: { obj: any, pref
   return result;
 }
 
-const findHomogeneousField = ({ obj, currentPath = '' }: { obj: any, currentPath?: string }): { path: string, obj: any } | null => {
+export const findHomogeneousField = ({ obj, currentPath = '' }: { obj: any, currentPath?: string }): { path: string, obj: any } | null => {
   if (typeof obj !== 'object' || obj === null) return null;
 
   // Check if this is homogeneous (all values have same keys)
@@ -48,7 +48,7 @@ const findHomogeneousField = ({ obj, currentPath = '' }: { obj: any, currentPath
   return null;
 }
 
-const findArrayField = ({ obj, currentPath = '' }: { obj: any, currentPath?: string }): { path: string, array: any[] } | null => {
+export const findArrayField = ({ obj, currentPath = '' }: { obj: any, currentPath?: string }): { path: string, array: any[] } | null => {
   if (typeof obj !== 'object' || obj === null) return null;
   // Recurse into nested objects/arrays
   for (const [key, value] of Object.entries(obj)) {
