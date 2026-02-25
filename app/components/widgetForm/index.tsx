@@ -110,7 +110,24 @@ export const WidgetForm = ({ onClose, onSave, initialValues }: { onClose: () => 
             />
           </div>
           <div>
-            <div className="text-sm mb-1">API URL</div>
+            <div className="flex justify-between items-center mb-1">
+              <div className="text-sm">API URL</div>
+              <select
+                className="bg-gray-800 text-xs p-1 rounded border border-gray-700 outline-none"
+                onChange={(e) => {
+                  if (e.target.value) {
+                    updateValue({ key: Fields.URL, _value: e.target.value });
+                    setData(undefined);
+                  }
+                }}
+                value=""
+              >
+                <option value="" disabled>Select API...</option>
+                <option value="https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=IBM&interval=5min&apikey=demo">AlphaVantage (Time Series)</option>
+                <option value="https://www.alphavantage.co/query?function=REALTIME_OPTIONS&symbol=IBM&apikey=demo">AlphaVantage (Realtime Options)</option>
+                <option value="https://api.coinbase.com/v2/exchange-rates?currency=BTC ">Coinbase (Exchange Rates)</option>
+              </select>
+            </div>
             <div className="flex gap-2">
               <input
                 value={value[Fields.URL]}
